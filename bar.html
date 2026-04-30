@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DotsBar — The Bar</title>
+  <meta name="description" content="Live Premier League matches, streaming rooms, real-time chat and virtual drinks — all inside DotsBar.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { padding-top: 68px; }
+    .bar-page-wrap {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      padding: 20px 24px 60px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .bar-left { display: flex; flex-direction: column; gap: 20px; }
+    .bar-right { display: flex; flex-direction: column; gap: 16px; }
+
+    .ad-banner {
+      background: linear-gradient(135deg, #1a1200, #2a1f00);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: var(--radius-md);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+    .ad-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -10%;
+      width: 200px; height: 200%;
+      background: radial-gradient(ellipse, rgba(245,158,11,0.1), transparent 70%);
+    }
+    .ad-brand { display: flex; align-items: center; gap: 14px; }
+    .ad-logo { font-size: 2.5rem; }
+    .ad-text h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .ad-text p { font-size: 0.8rem; color: var(--text-muted); }
+    .ad-cta { flex-shrink: 0; }
+
+    .scores-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .scores-panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .scores-panel-header h3 { font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .scores-list { padding: 0; }
+
+    .score-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--glass-border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .score-row:hover { background: rgba(255,255,255,0.02); }
+    .score-row:last-child { border-bottom: none; }
+    .score-row .team-side { display: flex; align-items: center; gap: 8px; }
+    .score-row .team-side.right { flex-direction: row-reverse; text-align: right; }
+    .score-row .team-crest-sm { font-size: 1.4rem; }
+    .score-row .team-short { font-size: 0.85rem; font-weight: 600; }
+    .score-row .score-center { text-align: center; }
+    .score-row .score-num { font-family: 'Outfit',sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--amber); }
+    .score-row .min-label { font-size: 0.7rem; color: var(--crimson); font-weight: 600; display: block; }
+
+    .streams-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+    }
+    .panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-header h3 { font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+    .stream-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--glass-border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .stream-row:hover { background: rgba(255,255,255,0.02); }
+    .stream-row:last-child { border-bottom: none; }
+    .stream-thumb-mini {
+      width: 80px; height: 50px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #1a0a2e, #4a1a6e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .stream-row-info { flex: 1; min-width: 0; }
+    .stream-row-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+    .stream-row-sub { font-size: 0.75rem; color: var(--text-muted); display: flex; gap: 8px; }
+
+    .jukebox-panel {
+      background: linear-gradient(135deg, #1a0a2e, #2d1b4e);
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+    .jukebox-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .jukebox-header h3 { font-size: 0.9rem; font-weight: 700; color: #a78bfa; display: flex; align-items: center; gap: 8px; }
+    .now-playing { display: flex; align-items: center; gap: 12px; }
+    .disc { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #4a1a6e, #1a0a2e); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; animation: spin-slow 4s linear infinite; border: 2px solid rgba(124,58,237,0.5); }
+    @keyframes spin-slow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .track-info { flex: 1; }
+    .track-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+    .track-artist { font-size: 0.75rem; color: #a78bfa; }
+    .visualizer { display: flex; align-items: flex-end; gap: 2px; height: 24px; }
+    .viz-bar { width: 3px; background: #a78bfa; border-radius: 2px; animation: wave-anim 0.6s ease-in-out infinite; }
+
+    @media (max-width: 1024px) { .bar-page-wrap { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .bar-page-wrap { padding: 14px; } }
+  </style>
+</head>
+<body>
+
+<div class="bar-ambient"></div>
+
+<!-- NAV -->
+<header id="main-header">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <img src="logo.svg" alt="DotsBar">
+      <span class="logo-text">Dots<span>Bar</span></span>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="bar.html" class="active">🍺 The Bar</a></li>
+        <li><a href="stream.html" class="live-indicator">Stream</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="marketplace.html">Shop</a></li>
+        <li><a href="index.html">Home</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <button class="btn btn-ghost btn-sm" id="nav-auth-btn">Log In</button>
+      <a href="stream.html" class="btn btn-danger btn-sm">🔴 Go Live</a>
+    </div>
+  </div>
+</header>
+
+<!-- LIVE TICKER -->
+<div class="ticker-bar" style="margin-top:0;">
+  <div class="ticker-wrapper">
+    <div class="ticker-label">⚽ LIVE</div>
+    <div class="ticker-track" id="ticker-track"></div>
+  </div>
+</div>
+
+<!-- MAIN BAR LAYOUT -->
+<div class="bar-page-wrap">
+
+  <!-- LEFT COLUMN -->
+  <div class="bar-left">
+
+    <!-- Ad Banner — Guinness -->
+    <div class="ad-banner" id="ad-banner">
+      <div class="ad-brand">
+        <div class="ad-logo">🍺</div>
+        <div class="ad-text">
+          <h3>Guinness — Made of More</h3>
+          <p>The official drink of DotsBar. Order yours in the shop.</p>
+        </div>
+      </div>
+      <a href="marketplace.html" class="btn btn-primary btn-sm ad-cta">Order Now</a>
+    </div>
+
+    <!-- Live Scores -->
+    <div class="scores-panel">
+      <div class="scores-panel-header">
+        <h3>⚽ Premier League — Live</h3>
+        <span class="live-badge">Live</span>
+      </div>
+      <div class="scores-list" id="scores-list">
+        <!-- JS populated -->
+      </div>
+    </div>
+
+    <!-- Live Streams Inside Bar -->
+    <div class="streams-panel">
+      <div class="panel-header">
+        <h3>🎥 Live Streams in the Bar</h3>
+        <a href="stream.html" class="btn btn-outline btn-sm">Browse All</a>
+      </div>
+      <div id="stream-rows">
+        <!-- JS populated -->
+      </div>
+    </div>
+
+    <!-- Jukebox -->
+    <div class="jukebox-panel">
+      <div class="jukebox-header">
+        <h3>🎵 Jukebox — Now Playing</h3>
+        <button class="btn btn-ghost btn-sm" style="color:#a78bfa;border-color:#a78bfa33;">Skip 🎵</button>
+      </div>
+      <div class="now-playing">
+        <div class="disc">💿</div>
+        <div class="track-info">
+          <div class="track-name">Blinding Lights</div>
+          <div class="track-artist">The Weeknd</div>
+        </div>
+        <div class="visualizer" id="visualizer"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="bar-right">
+
+    <!-- Chat Panel -->
+    <div class="chat-panel">
+      <div class="chat-header">
+        <h3>💬 Bar Chat <span class="live-badge" style="margin-left:4px;">Live</span></h3>
+        <span id="chat-user-count" style="font-size:0.8rem;color:var(--text-muted);">238 online</span>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <!-- seeded by JS -->
+      </div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chat-input" placeholder="Drop a message..." maxlength="200">
+        <button class="btn btn-primary btn-sm" id="chat-send">Send</button>
+      </div>
+    </div>
+
+    <!-- Order Panel -->
+    <div class="glass-card" style="padding:16px;">
+      <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;">🍺 Quick Order</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;" id="quick-order-list"></div>
+      <div class="divider"></div>
+      <a href="marketplace.html" class="btn btn-outline btn-sm w-full" style="justify-content:center;margin-top:0;">Full Bar Menu →</a>
+    </div>
+
+    <!-- Online People -->
+    <div class="glass-card" style="padding:16px;">
+      <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;">👥 People in the Bar</h3>
+      <div id="online-people" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="script.js"></script>
+<script>
+// ── Match data ────────────────────────────────────
+const liveMatches = [
+  { home:'Arsenal', homeEmoji:'🔴', away:'Chelsea', awayEmoji:'🔵', score:'2-1', min:72 },
+  { home:'Man City', homeEmoji:'💙', away:'Liverpool', awayEmoji:'❤️', score:'0-0', min:34 },
+  { home:'Spurs', homeEmoji:'⬜', away:'Man Utd', awayEmoji:'🔴', score:'1-2', min:58 },
+  { home:'Newcastle', homeEmoji:'⚫', away:'Everton', awayEmoji:'💙', score:'3-0', min:81 },
+  { home:'Brighton', homeEmoji:'🔵', away:'Wolves', awayEmoji:'🟡', score:'1-1', min:45 },
+  { home:'West Ham', homeEmoji:'⚒️', away:'Brentford', awayEmoji:'🐝', score:'0-1', min:22 },
+];
+
+// ── Ticker ──────────────────────────────────────
+const t = document.getElementById('ticker-track');
+if (t) {
+  const doubled = [...liveMatches, ...liveMatches];
+  t.innerHTML = doubled.map(m => `
+    <div class="ticker-item">
+      <span class="teams">${m.home} vs ${m.away}</span>
+      <span class="score">${m.score}</span>
+      <span class="sep">·</span>
+      <span style="color:var(--crimson);font-size:0.8rem;font-weight:600;">${m.min}'</span>
+    </div>
+  `).join('');
+}
+
+// simulate updating minutes
+function tickMinutes() {
+  liveMatches.forEach(m => { if (m.min < 90) m.min++; });
+}
+setInterval(tickMinutes, 60000);
+
+// ── Scores Panel ────────────────────────────────
+function buildScores() {
+  const el = document.getElementById('scores-list');
+  if (!el) return;
+  el.innerHTML = liveMatches.map(m => `
+    <div class="score-row" onclick="window.location.href='stream.html'">
+      <div class="team-side">
+        <span class="team-crest-sm">${m.homeEmoji}</span>
+        <span class="team-short">${m.home}</span>
+      </div>
+      <div class="score-center">
+        <div class="score-num">${m.score.replace('-',' - ')}</div>
+        <span class="min-label">🔴 ${m.min}'</span>
+      </div>
+      <div class="team-side right">
+        <span class="team-short">${m.away}</span>
+        <span class="team-crest-sm">${m.awayEmoji}</span>
+      </div>
+    </div>
+  `).join('');
+}
+buildScores();
+
+// ── Stream Rows ─────────────────────────────────
+const streams = [
+  { emoji:'⚽', title:'Arsenal Watch Party 🔴', host:'RedGunners', viewers:1204, cat:'sports' },
+  { emoji:'🎵', title:'Saturday Night DJ Mix', host:'DJ Kicks', viewers:847, cat:'music' },
+  { emoji:'🧠', title:'Pub Quiz Championship', host:'QuizMasterK', viewers:312, cat:'talk' },
+  { emoji:'📺', title:'Match Reaction & Analysis', host:'FootballNerd', viewers:588, cat:'sports' },
+];
+const sr = document.getElementById('stream-rows');
+if (sr) sr.innerHTML = streams.map(s => `
+  <div class="stream-row" onclick="window.location.href='stream.html'">
+    <div class="stream-thumb-mini">
+      ${s.emoji}
+      <span class="live-badge" style="position:absolute;top:4px;left:4px;font-size:0.55rem;padding:2px 6px;">LIVE</span>
+    </div>
+    <div class="stream-row-info">
+      <div class="stream-row-title">${s.title}</div>
+      <div class="stream-row-sub">
+        <span>👤 ${s.host}</span>
+        <span>👁 ${s.viewers.toLocaleString()}</span>
+        <span class="category-tag ${s.cat}" style="font-size:0.65rem;padding:1px 7px;">${s.cat}</span>
+      </div>
+    </div>
+  </div>
+`).join('');
+
+// ── Jukebox Visualizer ────────────────────────────
+const viz = document.getElementById('visualizer');
+if (viz) {
+  for (let i = 0; i < 10; i++) {
+    const b = document.createElement('div');
+    b.className = 'viz-bar';
+    b.style.animationDelay = `${i*0.08}s`;
+    b.style.height = `${4+Math.random()*16}px`;
+    viz.appendChild(b);
+  }
+}
+
+// ── Chat messages ─────────────────────────────────
+const seed = [
+  { u:'RedFan99', a:'R', msg:"COME ON ARSENAL!! 🔴🔴", col:'#f59e0b' },
+  { u:'FootyKing', a:'F', msg:'That goal was offside lol', col:'#7c3aed' },
+  { u:'DJ_Kicks', a:'D', msg:'🎵 next track dropping in 5', col:'#10b981' },
+  { u:'BarMaven', a:'B', msg:'Who wants a neon spritz? 🍹', col:'#ec4899' },
+  { u:'QuizK', a:'Q', msg:'Quiz starts at 7pm tonight!', col:'#3b82f6' },
+  { u:'Gooner1886', a:'G', msg:"YESSSS MARTINELLI 🚀🚀", col:'#f59e0b' },
+  { u:'LadyVibe', a:'L', msg:'This bar is everything fr 🙌', col:'#a78bfa' },
+];
+
+const chatEl = document.getElementById('chat-messages');
+function addMsg(u, a, msg, col) {
+  if (!chatEl) return;
+  const d = document.createElement('div');
+  d.className = 'chat-msg';
+  d.innerHTML = `
+    <div class="avatar avatar-sm" style="background:${col};color:#fff;flex-shrink:0;">${a}</div>
+    <div class="chat-msg-body">
+      <div class="chat-msg-name" style="color:${col};">${u}</div>
+      <div class="chat-msg-text">${msg}</div>
+    </div>
+  `;
+  chatEl.appendChild(d);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+seed.forEach(s => addMsg(s.u, s.a, s.msg, s.col));
+
+// Auto-add messages
+const auto = [
+  { u:'VibeCheck', a:'V', msg:"Best sports bar on the internet 🤝", col:'#f59e0b' },
+  { u:'PintPlease', a:'P', msg:'ordering another round 🍺🍺🍺', col:'#10b981' },
+  { u:'ScoreAlert', a:'S', msg:'3-0!! Newcastle are flying tonight', col:'#ef4444' },
+  { u:'NightOwl', a:'N', msg:'DJ Kicks always delivers 🔥', col:'#a78bfa' },
+];
+let ai = 0;
+setInterval(() => {
+  const m = auto[ai % auto.length]; ai++;
+  addMsg(m.u, m.a, m.msg, m.col);
+}, 7000);
+
+// Send chat message
+const sendBtn = document.getElementById('chat-send');
+const chatInput = document.getElementById('chat-input');
+function sendMsg() {
+  const v = chatInput.value.trim();
+  if (!v) return;
+  const user = JSON.parse(localStorage.getItem('user')||'null');
+  const name = user?.username || 'You';
+  addMsg(name, name[0].toUpperCase(), v, '#f59e0b');
+  chatInput.value = '';
+}
+sendBtn?.addEventListener('click', sendMsg);
+chatInput?.addEventListener('keydown', e => { if(e.key==='Enter') sendMsg(); });
+
+// ── Quick Order ──────────────────────────────────
+const drinks = [
+  { e:'🍺', n:'Guinness Draft', p:120 },
+  { e:'🍹', n:'Neon Spritz', p:200 },
+  { e:'🥃', n:'Smoky Scotch', p:350 },
+  { e:'🧃', n:'Mocktail Mojito', p:80 },
+];
+const qol = document.getElementById('quick-order-list');
+if (qol) qol.innerHTML = drinks.map(d => `
+  <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-card2);border-radius:var(--radius-sm);padding:8px 12px;">
+    <span style="font-size:0.85rem;">${d.e} ${d.n}</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="color:var(--amber);font-size:0.8rem;font-weight:700;">${d.p}🪙</span>
+      <button class="btn btn-primary btn-sm" onclick="addToCart('${d.n}',${d.p})" style="padding:4px 10px;font-size:0.75rem;">+</button>
+    </div>
+  </div>
+`).join('');
+
+// ── Online people ────────────────────────────────
+const ppl = ['RedFan99','DJ_Kicks','BarMaven','LadyVibe','GoalAlert','QuizK','FootyKing','PubLover','VibeCheck','NightOwl','Gooner1886','PintPlease'];
+const opEl = document.getElementById('online-people');
+if (opEl) opEl.innerHTML = ppl.map(p => `
+  <div style="display:flex;align-items:center;gap:6px;background:var(--bg-card2);border-radius:20px;padding:4px 10px;">
+    <div style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div>
+    <span style="font-size:0.75rem;color:var(--text-secondary);">${p}</span>
+  </div>
+`).join('');
+
+// ── Cart ──────────────────────────────────────────
+function addToCart(name, price) {
+  const cart = JSON.parse(localStorage.getItem('cart')||'[]');
+  cart.push({name,price});
+  localStorage.setItem('cart', JSON.stringify(cart));
+  showToast(`${name} ordered! 🍺`, 'info');
+}
+
+// ── Ad rotation ───────────────────────────────────
+const ads = [
+  { emoji:'🍺', h:'Guinness — Made of More', p:'The official drink of DotsBar. Order yours.', link:'marketplace.html' },
+  { emoji:'🍹', h:'Neon Spritz — New Drop', p:'Limited edition cocktail of the month. Try it!', link:'marketplace.html' },
+  { emoji:'🏟️', h:'Premier League on DotsBar', p:'Watch every match LIVE with 12K+ fans.', link:'bar.html' },
+  { emoji:'🎫', h:'DJ Kicks — Sat 22nd Apr', p:'Tickets selling fast for the biggest set of 2026.', link:'events.html' },
+];
+let adIdx = 0;
+function rotateAd() {
+  const a = ads[adIdx % ads.length]; adIdx++;
+  const b = document.getElementById('ad-banner');
+  if (!b) return;
+  b.style.opacity = 0;
+  setTimeout(() => {
+    b.innerHTML = `
+      <div class="ad-brand">
+        <div class="ad-logo">${a.emoji}</div>
+        <div class="ad-text"><h3>${a.h}</h3><p>${a.p}</p></div>
+      </div>
+      <a href="${a.link}" class="btn btn-primary btn-sm ad-cta">View Now</a>
+    `;
+    b.style.opacity = 1;
+  }, 400);
+}
+setInterval(rotateAd, 8000);
+
+// ── Toast ─────────────────────────────────────────
+function showToast(msg, type='info') {
+  const tc = document.getElementById('toast-container');
+  const t2 = document.createElement('div');
+  t2.className = `toast ${type}`;
+  t2.innerHTML = `<span>${type==='success'?'✅':type==='error'?'❌':'🍺'}</span><span>${msg}</span>`;
+  tc.appendChild(t2);
+  setTimeout(() => t2.remove(), 4000);
+}
+
+// ── Auth state ────────────────────────────────────
+(function() {
+  const user = JSON.parse(localStorage.getItem('user')||'null');
+  const btn = document.getElementById('nav-auth-btn');
+  if (user && btn) { btn.textContent = `👤 ${user.username}`; }
+})();
+</script>
+</body>
+</html>

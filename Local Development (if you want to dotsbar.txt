@@ -1,0 +1,5 @@
+Local Development (if you want to test locally):
+
+Frontend: http://localhost:8000
+Backend API: http://localhost:3001
+Firebase Console: Visit https://console.firebase.google.com/project/dotsbar-6106f-2024/hosting to manage your hosting setting

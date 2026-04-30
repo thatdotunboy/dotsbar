@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DotsBar — Where The World Comes To Vibe</title>
+  <meta name="description" content="DotsBar is the world's first virtual sports bar and streaming platform. Watch live matches, join spaces, order drinks, and connect with fans.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Landing page overrides ── */
+    body { min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Full-screen hero */
+    #hero {
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 24px 60px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(245,158,11,0.1) 0%, transparent 55%),
+        radial-gradient(ellipse at 70% 70%, rgba(124,58,237,0.07) 0%, transparent 55%),
+        var(--bg-deep);
+    }
+
+    .hero-grid-bg {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+      pointer-events: none;
+    }
+
+    .hero-particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .particle { position: absolute; width: 3px; height: 3px; background: var(--amber); border-radius: 50%; animation: float-particle linear infinite; opacity: 0; }
+    @keyframes float-particle {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      10% { opacity: 0.6; } 90% { opacity: 0.1; }
+      100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+    }
+
+    .hero-inner {
+      position: relative; z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.3);
+      color: var(--amber);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+    .hero-pill::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--crimson);
+      border-radius: 50%;
+      animation: pulse-dot 1.4s infinite;
+    }
+
+    .hero-h1 {
+      font-size: clamp(2.6rem, 6vw, 4.4rem);
+      font-weight: 900;
+      line-height: 1.08;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+
+    .hero-h1 .g {
+      background: linear-gradient(135deg, var(--amber), #d97706);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 52px;
+    }
+
+    /* Feature pills strip */
+    .feature-pills {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .fpill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      transition: var(--transition);
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .fpill:hover {
+      border-color: var(--amber);
+      color: var(--text-primary);
+      background: rgba(245,158,11,0.08);
+    }
+
+    .fpill-icon { font-size: 1rem; }
+
+    /* Slim footer */
+    .landing-footer {
+      text-align: center;
+      padding: 20px 24px;
+      border-top: 1px solid var(--glass-border);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .landing-footer a { color: var(--text-muted); transition: color 0.2s; }
+    .landing-footer a:hover { color: var(--amber); }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<header id="main-header">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <img src="logo.svg" alt="DotsBar">
+      <span class="logo-text">Dots<span>Bar</span></span>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="bar.html">🍺 The Bar</a></li>
+        <li><a href="stream.html" class="live-indicator">Stream</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="marketplace.html">Shop</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <button class="btn btn-outline" id="open-login">Log In</button>
+      <button class="btn btn-primary" id="open-register">Join Free</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-particles" id="particles-container"></div>
+
+  <div class="hero-inner">
+    <div class="hero-pill">2,847 people vibing right now</div>
+
+    <h1 class="hero-h1">
+      The World's First<br>
+      <span class="g">Virtual Sports Bar</span><br>
+      &amp; Streaming Hub
+    </h1>
+
+    <p class="hero-sub">
+      Watch live Premier League matches, join streaming spaces,
+      order virtual drinks, and connect with fans across the world.
+    </p>
+
+    <div class="hero-cta-row">
+      <a href="bar.html" class="btn btn-primary btn-lg">🍺 Enter The Bar</a>
+      <a href="stream.html" class="btn btn-outline btn-lg">🎥 Watch Live</a>
+    </div>
+
+    <div class="feature-pills">
+      <a class="fpill" href="bar.html"><span class="fpill-icon">⚽</span> Live Matches</a>
+      <a class="fpill" href="stream.html"><span class="fpill-icon">🎥</span> Streaming</a>
+      <a class="fpill" href="events.html"><span class="fpill-icon">📅</span> Events</a>
+      <a class="fpill" href="marketplace.html"><span class="fpill-icon">🍺</span> Bar Menu</a>
+      <a class="fpill" href="#"><span class="fpill-icon">💬</span> Community</a>
+    </div>
+  </div>
+</section>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close">✕</button>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
+      <button class="modal-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+    </div>
+    <div id="login-form">
+      <input type="email" class="form-input" id="login-email" placeholder="Email address">
+      <input type="password" class="form-input" id="login-password" placeholder="Password">
+      <button class="btn btn-primary w-full" id="login-btn" style="justify-content:center;">Log In</button>
+    </div>
+    <div id="register-form" class="hidden">
+      <input type="text" class="form-input" id="reg-username" placeholder="Username">
+      <input type="email" class="form-input" id="reg-email" placeholder="Email address">
+      <input type="password" class="form-input" id="reg-password" placeholder="Password">
+      <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">
+        <input type="checkbox" id="reg-creator"> I'm a creator / host
+      </label>
+      <button class="btn btn-primary w-full" id="register-btn" style="justify-content:center;">Create My Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- SLIM FOOTER -->
+<footer class="landing-footer">
+  <span>© 2026 DotsBar — Drink. Stream. Belong.</span>
+  <a href="#">Privacy</a>
+  <a href="#">Terms</a>
+  <a href="#">Discord</a>
+</footer>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// Particles
+(function() {
+  const c = document.getElementById('particles-container');
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `left:${Math.random()*100}%;animation-duration:${7+Math.random()*14}s;animation-delay:${Math.random()*-18}s;width:${2+Math.random()*2.5}px;height:${2+Math.random()*2.5}px;`;
+    c.appendChild(p);
+  }
+})();
+
+// Modal
+const modal = document.getElementById('auth-modal');
+document.getElementById('open-login')?.addEventListener('click', () => { switchTab('login'); modal.classList.add('open'); });
+document.getElementById('open-register')?.addEventListener('click', () => { switchTab('register'); modal.classList.add('open'); });
+document.getElementById('modal-close')?.addEventListener('click', () => modal.classList.remove('open'));
+modal?.addEventListener('click', e => { if(e.target===modal) modal.classList.remove('open'); });
+
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register').classList.toggle('active', tab==='register');
+  document.getElementById('login-form').classList.toggle('hidden', tab!=='login');
+  document.getElementById('register-form').classList.toggle('hidden', tab!=='register');
+}
+
+document.getElementById('login-btn')?.addEventListener('click', async () => {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  try {
+    const r = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password}) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    localStorage.setItem('token', d.token);
+    localStorage.setItem('user', JSON.stringify(d.user));
+    modal.classList.remove('open');
+    showToast(`Welcome back, ${d.user.username}! 🍺`, 'success');
+    setTimeout(() => window.location.href='bar.html', 1200);
+  } catch(e) { showToast(e.message||'Login failed','error'); }
+});
+
+document.getElementById('register-btn')?.addEventListener('click', async () => {
+  const username = document.getElementById('reg-username').value;
+  const email = document.getElementById('reg-email').value;
+  const password = document.getElementById('reg-password').value;
+  const isCreator = document.getElementById('reg-creator').checked;
+  try {
+    const r = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username,email,password,isCreator}) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    localStorage.setItem('token', d.token);
+    localStorage.setItem('user', JSON.stringify(d.user));
+    modal.classList.remove('open');
+    showToast(`Welcome to DotsBar, ${d.user.username}! 🎉`, 'success');
+    setTimeout(() => window.location.href='bar.html', 1200);
+  } catch(e) { showToast(e.message||'Registration failed','error'); }
+});
+
+function showToast(msg, type='info') {
+  const tc = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${type==='success'?'✅':type==='error'?'❌':'🍺'}</span><span>${msg}</span>`;
+  tc.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+// Auth state
+(function() {
+  const user = JSON.parse(localStorage.getItem('user')||'null');
+  if (user) {
+    const li = document.getElementById('open-login');
+    const reg = document.getElementById('open-register');
+    if (li) { li.textContent = `👤 ${user.username}`; li.onclick = () => window.location.href='bar.html'; }
+    if (reg) { reg.textContent = '🍺 Enter Bar'; reg.onclick = () => window.location.href='bar.html'; }
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DotsBar — Stream & Join Spaces</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { padding-top: 68px; background: var(--bg-deep); }
+    .stream-page-wrap { max-width: 1400px; margin: 0 auto; padding: 24px; }
+    .stream-main-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .stream-left {}
+    .stream-right { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Player area */
+    .stream-player-box {
+      background: #000;
+      border-radius: var(--radius-lg);
+      aspect-ratio: 16/9;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--glass-border);
+    }
+    .stream-player-box video { width:100%; height:100%; object-fit:cover; }
+    .stream-player-box .no-stream {
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+      text-align: center; padding: 40px;
+    }
+    .stream-player-box .no-stream .big-emoji { font-size: 4rem; }
+    .stream-player-box .no-stream h3 { font-size: 1.2rem; font-weight: 700; }
+    .stream-player-box .no-stream p { color: var(--text-muted); font-size: 0.9rem; }
+
+    .stream-controls-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; gap: 12px; flex-wrap: wrap;
+    }
+    .stream-controls-left { display: flex; gap: 10px; align-items: center; }
+    .stream-controls-right { display: flex; gap: 10px; align-items: center; }
+
+    .stream-info-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+    .stream-info-bar .title { font-family: 'Outfit',sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+    .stream-info-bar .meta { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .stream-info-bar .meta span { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+
+    /* Host controls */
+    .host-panel {
+      background: linear-gradient(135deg, rgba(220,38,38,0.08), rgba(245,158,11,0.05));
+      border: 1px solid rgba(220,38,38,0.3);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+    .host-panel h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 12px; color: var(--crimson); }
+    .host-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* Viewer count ticker */
+    .viewer-ticker {
+      display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
+      background: rgba(0,0,0,0.5); padding: 6px 14px; border-radius: 20px;
+    }
+    .viewer-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse-dot 1.5s infinite; }
+
+    /* Reactions bar */
+    .reactions-bar {
+      display: flex; gap: 8px; padding: 10px 0;
+    }
+    .reaction-btn {
+      background: var(--bg-card); border: 1px solid var(--glass-border);
+      border-radius: 20px; padding: 6px 14px; cursor: pointer;
+      font-size: 0.9rem; display: flex; align-items: center; gap: 6px;
+      transition: var(--transition);
+    }
+    .reaction-btn:hover { border-color: var(--amber); transform: scale(1.1); }
+    .reaction-count { font-size: 0.75rem; color: var(--text-muted); font-family: 'Outfit',sans-serif; font-weight: 600; }
+
+    /* Spaces grid */
+    .spaces-section { margin-top: 40px; }
+    .spaces-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .space-card {
+      background: var(--bg-card); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: var(--transition);
+    }
+    .space-card:hover { transform: translateY(-4px); border-color: rgba(245,158,11,0.3); box-shadow: var(--shadow-amber); }
+    .space-card-thumb {
+      aspect-ratio: 16/7;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; position: relative;
+    }
+    .space-card-body { padding: 14px 16px; }
+    .space-card-title { font-family:'Outfit',sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+    .space-card-meta { display: flex; gap: 10px; align-items: center; font-size: 0.78rem; color: var(--text-muted); }
+
+    @media (max-width: 1024px) { .stream-main-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .stream-page-wrap { padding: 14px; } }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<header id="main-header">
+  <div class="container">
+    <a href="index.html" class="logo">
+      <img src="logo.svg" alt="DotsBar">
+      <span class="logo-text">Dots<span>Bar</span></span>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="bar.html">🍺 The Bar</a></li>
+        <li><a href="stream.html" class="active live-indicator">Stream</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="marketplace.html">Shop</a></li>
+        <li><a href="index.html">Home</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <button class="btn btn-ghost btn-sm" id="nav-user-btn">Log In</button>
+      <button class="btn btn-danger btn-sm" id="go-live-btn">🔴 Go Live</button>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="stream-page-wrap">
+  <div class="stream-main-layout">
+    <!-- LEFT: Stream Player -->
+    <div class="stream-left">
+
+      <!-- Stream metadata bar -->
+      <div class="stream-info-bar" id="stream-info-bar">
+        <div class="title" id="stream-title-display">Arsenal Watch Party 🔴 — Match Day Special</div>
+        <div class="meta">
+          <span><div class="avatar avatar-sm" style="display:inline-flex;background:linear-gradient(135deg,#f59e0b,#d97706);">R</div> &nbsp;RedGunners</span>
+          <span class="category-tag sports">Sports</span>
+          <span class="live-badge">Live</span>
+          <span id="viewer-display">👁 1,204 watching</span>
+        </div>
+      </div>
+
+      <!-- Player -->
+      <div class="stream-player-box" id="stream-player-box">
+        <video id="remote-video" autoplay playsinline style="display:none;"></video>
+        <video id="local-video" autoplay muted playsinline style="display:none;position:absolute;bottom:12px;right:12px;width:160px;border-radius:8px;border:2px solid var(--amber);"></video>
+        <div class="no-stream" id="no-stream-msg">
+          <div class="big-emoji">🎥</div>
+          <h3>Waiting for Stream...</h3>
+          <p>The host hasn't gone live yet. Join the watch party below or start your own stream.</p>
+          <button class="btn btn-primary" id="start-stream-btn">🔴 Start Your Stream</button>
+        </div>
+      </div>
+
+      <!-- Controls bar -->
+      <div class="stream-controls-bar">
+        <div class="stream-controls-left">
+          <div class="viewer-ticker">
+            <div class="viewer-dot"></div>
+            <span id="viewer-count-text">1,204 watching</span>
+          </div>
+          <div class="reactions-bar" id="reactions-bar">
+            <button class="reaction-btn" onclick="react('🔥')">🔥 <span class="reaction-count" id="r-fire">248</span></button>
+            <button class="reaction-btn" onclick="react('❤️')">❤️ <span class="reaction-count" id="r-heart">182</span></button>
+            <button class="reaction-btn" onclick="react('⚽')">⚽ <span class="reaction-count" id="r-ball">94</span></button>
+            <button class="reaction-btn" onclick="react('🍺')">🍺 <span class="reaction-count" id="r-beer">317</span></button>
+          </div>
+        </div>
+        <div class="stream-controls-right">
+          <button class="btn btn-ghost btn-sm" id="tip-btn">💸 Send Tip</button>
+          <button class="btn btn-outline btn-sm" onclick="window.location.href='events.html'">📅 Schedule Event</button>
+        </div>
+      </div>
+
+      <!-- Host panel (hidden by default) -->
+      <div class="host-panel hidden" id="host-panel">
+        <h3>🔴 Host Controls</h3>
+        <div class="host-controls">
+          <button class="btn btn-danger btn-sm" id="toggle-cam-btn">📷 Camera Off</button>
+          <button class="btn btn-ghost btn-sm" id="toggle-mic-btn">🎤 Mic On</button>
+          <button class="btn btn-outline btn-sm" id="stop-stream-btn">⏹ End Stream</button>
+          <input class="form-input" id="stream-title-input" placeholder="Stream title..." style="flex:1;min-width:200px;margin-bottom:0;">
+          <button class="btn btn-primary btn-sm" onclick="updateTitle()">Update</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Chat + Tip -->
+    <div class="stream-right">
+      <!-- Live chat -->
+      <div class="chat-panel" style="height:500px;">
+        <div class="chat-header">
+          <h3>💬 Live Chat <span class="live-badge" style="margin-left:4px;">Live</span></h3>
+          <span id="stream-chat-count" style="font-size:0.8rem;color:var(--text-muted);">1,204 viewers</span>
+        </div>
+        <div class="chat-messages" id="stream-chat"></div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="stream-chat-input" placeholder="Chat with viewers..." maxlength="200">
+          <button class="btn btn-primary btn-sm" id="stream-chat-send">Send</button>
+        </div>
+      </div>
+
+      <!-- Tip panel -->
+      <div class="glass-card" style="padding:16px;">
+        <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;">💸 Support the Creator</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <button class="btn btn-outline btn-sm" onclick="tip(50)">🪙 50</button>
+          <button class="btn btn-outline btn-sm" onclick="tip(100)">🪙 100</button>
+          <button class="btn btn-outline btn-sm" onclick="tip(250)">🪙 250</button>
+          <button class="btn btn-primary btn-sm" onclick="tip(500)">🪙 500 🔥</button>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <input class="form-input" id="custom-tip" placeholder="Custom amount" type="number" min="1" style="margin-bottom:0;flex:1;">
+          <button class="btn btn-primary btn-sm" onclick="tip(parseInt(document.getElementById('custom-tip').value)||0)">Send</button>
+        </div>
+      </div>
+
+      <!-- Online viewers -->
+      <div class="glass-card" style="padding:16px;">
+        <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;">👥 In This Stream</h3>
+        <div id="stream-viewers" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPACES -->
+  <div class="spaces-section">
+    <div class="section-label">🚀 Spaces</div>
+    <h2 class="section-title" style="margin-bottom:8px;">Join a Space</h2>
+    <p class="section-sub">Live spaces happening right now. Drop in, chat, and vibe.</p>
+
+    <div class="spaces-grid" id="spaces-grid">
+      <!-- JS populated -->
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+const spaces = [
+  { emoji:'⚽', title:'Arsenal Watch Party', host:'RedGunners', viewers:1204, cat:'sports', bg:'linear-gradient(135deg,#1a0000,#4a0000)' },
+  { emoji:'🎵', title:'Saturday Night Mix', host:'DJ Kicks', viewers:847, cat:'music', bg:'linear-gradient(135deg,#1a0a2e,#4a1a6e)' },
+  { emoji:'🧠', title:'Pub Quiz Live!', host:'QuizMasterK', viewers:312, cat:'talk', bg:'linear-gradient(135deg,#0a1a2e,#1a4a6e)' },
+  { emoji:'🎤', title:'Open Mic Night', host:'VibeComedyUK', viewers:445, cat:'talk', bg:'linear-gradient(135deg,#0a2e0a,#1a6a1a)' },
+  { emoji:'🍹', title:'Cocktail Class', host:'BarMaven', viewers:219, cat:'events', bg:'linear-gradient(135deg,#2e0a1a,#6a1a4a)' },
+  { emoji:'📺', title:'Match Analysis', host:'FootballNerd', viewers:588, cat:'sports', bg:'linear-gradient(135deg,#1a1a0a,#4a4a0a)' },
+];
+
+// Build spaces grid
+const sg = document.getElementById('spaces-grid');
+if (sg) sg.innerHTML = spaces.map(s => `
+  <div class="space-card" onclick="joinSpace('${s.title}')">
+    <div class="space-card-thumb" style="background:${s.bg};">
+      ${s.emoji}
+      <span class="live-badge" style="position:absolute;top:8px;left:8px;">Live</span>
+      <span class="viewer-pill" style="position:absolute;bottom:8px;right:8px;font-size:0.75rem;">👁 ${s.viewers.toLocaleString()}</span>
+    </div>
+    <div class="space-card-body">
+      <div class="space-card-title">${s.title}</div>
+      <div class="space-card-meta">
+        <span>👤 ${s.host}</span>
+        <span class="category-tag ${s.cat}">${s.cat}</span>
+      </div>
+    </div>
+  </div>
+`).join('');
+
+// Chat seed
+const chatSeed = [
+  { u:'RedFan99', a:'R', c:'#f59e0b', msg:"COME ON ARSENAL 🔴🔴" },
+  { u:'Gooner1886', a:'G', c:'#ef4444', msg:'Martinelli is 🔥 tonight!' },
+  { u:'FootyKing', a:'F', c:'#7c3aed', msg:'Great stream quality today!' },
+  { u:'VibeCheck', a:'V', c:'#10b981', msg:'DotsBar never disappoints 🙌' },
+  { u:'LadyFan', a:'L', c:'#ec4899', msg:'First time watching here, love the vibe!!'},
+  { u:'QuizK', a:'Q', c:'#3b82f6', msg:'Quiz starts right after the match 🧠'},
+];
+
+const chatEl = document.getElementById('stream-chat');
+function addMsg(u, a, c, msg) {
+  if (!chatEl) return;
+  const d = document.createElement('div');
+  d.className = 'chat-msg';
+  d.innerHTML = `
+    <div class="avatar avatar-sm" style="background:${c};color:#fff;flex-shrink:0;">${a}</div>
+    <div class="chat-msg-body">
+      <div class="chat-msg-name" style="color:${c};">${u}</div>
+      <div class="chat-msg-text">${msg}</div>
+    </div>`;
+  chatEl.appendChild(d);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+chatSeed.forEach(m => addMsg(m.u, m.a, m.c, m.msg));
+
+const autoMsgs = [
+  { u:'PintPlease', a:'P', c:'#f59e0b', msg:'🍺🍺🍺 cheers everyone!' },
+  { u:'ScoreAlert', a:'S', c:'#ef4444', msg:'GOAL! Arsenal make it 3!! 🔴' },
+  { u:'NightOwl', a:'N', c:'#a78bfa', msg:'This commentary is class lol' },
+  { u:'TopViewer', a:'T', c:'#10b981', msg:'Just sent a 500 tip! Keep it up! 💸' },
+];
+let ai = 0;
+setInterval(() => { const m = autoMsgs[ai%autoMsgs.length]; ai++; addMsg(m.u, m.a, m.c, m.msg); }, 6000);
+
+const sendBtn = document.getElementById('stream-chat-send');
+const cinput = document.getElementById('stream-chat-input');
+function sendChat() {
+  const v = cinput.value.trim(); if (!v) return;
+  const user = JSON.parse(localStorage.getItem('user')||'null');
+  addMsg(user?.username||'You', (user?.username||'Y')[0], '#f59e0b', v);
+  cinput.value = '';
+}
+sendBtn?.addEventListener('click', sendChat);
+cinput?.addEventListener('keydown', e => { if(e.key==='Enter') sendChat(); });
+
+// Viewers
+const viewerNames = ['RedFan99','DJ_Kicks','BarMaven','LadyVibe','GoalAlert','QuizK','FootyKing','PubLover','VibeCheck','NightOwl','Gooner1886','PintPlease','TopViewer','ScoreAlert'];
+const vEl = document.getElementById('stream-viewers');
+if (vEl) vEl.innerHTML = viewerNames.map(p => `
+  <div style="display:flex;align-items:center;gap:5px;background:var(--bg-card2);border-radius:20px;padding:3px 10px;">
+    <div style="width:5px;height:5px;border-radius:50%;background:var(--green);"></div>
+    <span style="font-size:0.72rem;color:var(--text-secondary);">${p}</span>
+  </div>`).join('');
+
+// Reactions
+const rCounts = { fire: 248, heart: 182, ball: 94, beer: 317 };
+const rMap = { '🔥':'fire', '❤️':'heart', '⚽':'ball', '🍺':'beer' };
+function react(emoji) {
+  const k = rMap[emoji];
+  rCounts[k]++;
+  document.getElementById(`r-${k}`).textContent = rCounts[k];
+  showToast(`${emoji} reaction sent!`, 'info');
+}
+
+// Tip
+function tip(amount) {
+  if (!amount || amount <= 0) return;
+  showToast(`💸 ${amount} DotsCoins sent! Thank you!`, 'success');
+}
+
+// Go live / viewer count simulation
+let viewerCount = 1204;
+setInterval(() => {
+  viewerCount += Math.floor(Math.random()*5) - 1;
+  const el = document.getElementById('viewer-count-text');
+  const el2 = document.getElementById('viewer-display');
+  if (el) el.textContent = `${viewerCount.toLocaleString()} watching`;
+  if (el2) el2.innerHTML = `👁 ${viewerCount.toLocaleString()} watching`;
+}, 5000);
+
+// Stream start (simplified - no WebRTC server needed for MVP demo)
+document.getElementById('go-live-btn')?.addEventListener('click', startGoLive);
+document.getElementById('start-stream-btn')?.addEventListener('click', startGoLive);
+
+async function startGoLive() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    const lv = document.getElementById('local-video');
+    lv.srcObject = stream;
+    lv.style.display = 'block';
+    document.getElementById('no-stream-msg').style.display = 'none';
+    document.getElementById('host-panel').classList.remove('hidden');
+    document.getElementById('go-live-btn').textContent = '🔴 You\'re Live!';
+    document.getElementById('go-live-btn').style.background = 'var(--green)';
+    showToast('🔴 You\'re now LIVE! Viewers can join your space.', 'success');
+    window._liveStream = stream;
+  } catch(e) {
+    showToast('Camera access denied. Please allow camera permissions.', 'error');
+  }
+}
+
+document.getElementById('stop-stream-btn')?.addEventListener('click', () => {
+  if (window._liveStream) { window._liveStream.getTracks().forEach(t => t.stop()); }
+  document.getElementById('local-video').style.display = 'none';
+  document.getElementById('no-stream-msg').style.display = 'flex';
+  document.getElementById('host-panel').classList.add('hidden');
+  document.getElementById('go-live-btn').textContent = '🔴 Go Live';
+  document.getElementById('go-live-btn').style.background = '';
+  showToast('Stream ended. Thanks for streaming! 👏', 'info');
+});
+
+let camOn = true;
+document.getElementById('toggle-cam-btn')?.addEventListener('click', () => {
+  if (!window._liveStream) return;
+  const vt = window._liveStream.getVideoTracks()[0];
+  camOn = !camOn;
+  if (vt) vt.enabled = camOn;
+  document.getElementById('toggle-cam-btn').textContent = camOn ? '📷 Camera Off' : '📷 Camera On';
+});
+
+let micOn = true;
+document.getElementById('toggle-mic-btn')?.addEventListener('click', () => {
+  if (!window._liveStream) return;
+  const at = window._liveStream.getAudioTracks()[0];
+  micOn = !micOn;
+  if (at) at.enabled = micOn;
+  document.getElementById('toggle-mic-btn').textContent = micOn ? '🎤 Mic On' : '🎤 Mic Off';
+});
+
+function updateTitle() {
+  const v = document.getElementById('stream-title-input').value.trim();
+  if (v) { document.getElementById('stream-title-display').textContent = v; showToast('Stream title updated!', 'success'); }
+}
+
+function joinSpace(title) {
+  document.getElementById('stream-title-display').textContent = title;
+  showToast(`Joined "${title}" space! 🎉`, 'success');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showToast(msg, type='info') {
+  const tc = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${type==='success'?'✅':type==='error'?'❌':'🍺'}</span><span>${msg}</span>`;
+  tc.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+(function() {
+  const user = JSON.parse(localStorage.getItem('user')||'null');
+  const btn = document.getElementById('nav-user-btn');
+  if (user && btn) btn.textContent = `👤 ${user.username}`;
+})();
+</script>
+</body>
+</html>

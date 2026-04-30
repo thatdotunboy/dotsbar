@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DotsBar — Shop & Marketplace</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { padding-top: 68px; }
+    .market-wrap { max-width: 1280px; margin: 0 auto; padding: 40px 24px 80px; }
+    .market-hero {
+      background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(180,83,9,0.05));
+      border: 1px solid rgba(245,158,11,0.25);
+      border-radius: var(--radius-xl);
+      padding: 48px;
+      margin-bottom: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .market-hero h1 { font-size: 2rem; font-weight: 900; margin-bottom: 8px; }
+    .market-hero p { color: var(--text-secondary); font-size: 1rem; }
+    .coins-display {
+      background: var(--bg-card2);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: var(--radius-md);
+      padding: 16px 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .coins-display .amount { font-family:'Outfit',sans-serif; font-size:2rem; font-weight:900; color:var(--amber); }
+    .coins-display .label { font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
+
+    .market-layout { display: grid; grid-template-columns: 220px 1fr; gap: 28px; }
+    .market-sidebar {}
+    .market-main {}
+
+    .sidebar-section { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; }
+    .sidebar-title { font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:14px; }
+    .sidebar-link { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:var(--radius-sm); font-size:0.9rem; cursor:pointer; transition:background 0.2s; color:var(--text-secondary); margin-bottom:4px; }
+    .sidebar-link:hover, .sidebar-link.active { background:rgba(245,158,11,0.1); color:var(--amber); }
+    .sidebar-link span { font-size:1.1rem; }
+
+    .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px; }
+    .product-card { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); overflow:hidden; transition:var(--transition); cursor:pointer; }
+    .product-card:hover { transform:translateY(-6px); border-color:rgba(245,158,11,0.3); box-shadow:var(--shadow-amber); }
+    .product-img { aspect-ratio:1; background:linear-gradient(135deg,var(--bg-card2),#1e1a2e); display:flex; align-items:center; justify-content:center; font-size:4rem; position:relative; }
+    .product-badge { position:absolute; top:10px; right:10px; }
+    .product-body { padding:16px; }
+    .product-name { font-family:'Outfit',sans-serif; font-size:0.9rem; font-weight:700; margin-bottom:4px; }
+    .product-desc { font-size:0.78rem; color:var(--text-muted); margin-bottom:12px; line-height:1.4; }
+    .product-footer { display:flex; align-items:center; justify-content:space-between; }
+    .product-price { font-family:'Outfit',sans-serif; font-size:0.95rem; font-weight:700; color:var(--amber); }
+
+    .cart-sidebar { position:sticky; top:88px; }
+    .cart-panel { background:var(--bg-card); border:1px solid var(--glass-border); border-radius:var(--radius-lg); padding:20px; }
+    .cart-panel h3 { font-size:0.95rem; font-weight:700; margin-bottom:16px; }
+    .cart-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--glass-border); font-size:0.85rem; }
+    .cart-item:last-of-type { border-bottom:none; }
+    .cart-empty { text-align:center; color:var(--text-muted); font-size:0.85rem; padding:20px 0; }
+    .cart-total { font-family:'Outfit',sans-serif; font-weight:800; color:var(--amber); font-size:1.1rem; }
+
+    .brand-ad {
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      background: linear-gradient(135deg,#1a1200,#2a1f00);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: var(--radius-lg); padding: 20px 28px;
+      margin-bottom: 28px; flex-wrap:wrap;
+    }
+    .brand-ad-left { display:flex; align-items:center; gap:14px; }
+    .brand-ad-logo { font-size:2.5rem; }
+    .brand-ad h3 { font-size:1rem; font-weight:700; margin-bottom:4px; }
+    .brand-ad p { font-size:0.82rem; color:var(--text-muted); }
+
+    .tabs-row { display:flex; gap:6px; margin-bottom:24px; flex-wrap:wrap; }
+    .tab-btn { padding:8px 18px; border-radius:var(--radius-sm); font-family:'Outfit',sans-serif; font-size:0.85rem; font-weight:600; cursor:pointer; color:var(--text-secondary); background:var(--bg-card); border:1px solid var(--glass-border); transition:var(--transition); }
+    .tab-btn.active { background:linear-gradient(135deg,var(--amber),var(--gold)); color:#000; border-color:transparent; }
+
+    .send-gift-row { margin-top:8px; }
+
+    @media (max-width:1024px) { .market-layout { grid-template-columns: 1fr; } }
+    @media (max-width:768px) { .market-wrap { padding:16px; } .market-hero { padding:28px 24px; } }
+  </style>
+</head>
+<body>
+<header id="main-header">
+  <div class="container">
+    <a href="index.html" class="logo"><img src="logo.svg" alt="DotsBar"><span class="logo-text">Dots<span>Bar</span></span></a>
+    <nav><ul>
+      <li><a href="bar.html">🍺 The Bar</a></li>
+      <li><a href="stream.html" class="live-indicator">Stream</a></li>
+      <li><a href="events.html">Events</a></li>
+      <li><a href="marketplace.html" class="active">Shop</a></li>
+      <li><a href="index.html">Home</a></li>
+    </ul></nav>
+    <div class="nav-actions">
+      <button class="btn btn-ghost btn-sm" id="nav-user-btn">Log In</button>
+      <button class="btn btn-outline btn-sm" id="cart-nav-btn" style="position:relative;">
+        🛒 Cart <span id="cart-badge" class="cart-count-badge hidden">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="market-wrap">
+  <div class="market-hero">
+    <div>
+      <div class="section-label">🛒 DotsBar Shop</div>
+      <h1>The Bar Menu</h1>
+      <p>Order virtual drinks, send rounds to mates, unlock collectibles. Spend DotsCoins, collect vibes.</p>
+    </div>
+    <div class="coins-display">
+      <div class="amount" id="coins-amount">1,000</div>
+      <div class="label">🪙 DotsCoins</div>
+      <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center;">Top Up</button>
+    </div>
+  </div>
+
+  <!-- Brand ad -->
+  <div class="brand-ad">
+    <div class="brand-ad-left">
+      <div class="brand-ad-logo">🍺</div>
+      <div>
+        <h3>Guinness — Official DotsBar Partner</h3>
+        <p>Made of More. Now available on DotsBar. Order a virtual pint, represent the culture.</p>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="addToCart({name:'Guinness Draft',emoji:'🍺',price:120,cat:'drinks'})">Order Guinness 🍺</button>
+  </div>
+
+  <div class="market-layout">
+    <!-- SIDEBAR -->
+    <div class="market-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Categories</div>
+        <div class="sidebar-link active" onclick="filterProducts(this,'all')"><span>🛒</span> All Items</div>
+        <div class="sidebar-link" onclick="filterProducts(this,'drinks')"><span>🍺</span> Drinks</div>
+        <div class="sidebar-link" onclick="filterProducts(this,'shots')"><span>🥃</span> Shots & Spirits</div>
+        <div class="sidebar-link" onclick="filterProducts(this,'cocktails')"><span>🍹</span> Cocktails</div>
+        <div class="sidebar-link" onclick="filterProducts(this,'food')"><span>🍟</span> Bar Bites</div>
+        <div class="sidebar-link" onclick="filterProducts(this,'merch')"><span>👕</span> Merch</div>
+        <div class="sidebar-link" onclick="filterProducts(this,'collectibles')"><span>✨</span> Collectibles</div>
+      </div>
+      <!-- Cart -->
+      <div class="cart-panel cart-sidebar">
+        <h3>🛒 Your Order</h3>
+        <div id="cart-list"><div class="cart-empty">Your order is empty.<br>Add something from the bar!</div></div>
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
+          <span style="font-size:0.9rem;color:var(--text-muted);">Total</span>
+          <span class="cart-total" id="cart-total">0 🪙</span>
+        </div>
+        <button class="btn btn-primary w-full" style="justify-content:center;" onclick="checkout()">Place Order 🍺</button>
+        <div class="send-gift-row" style="margin-top:8px;">
+          <input class="form-input" id="gift-to" placeholder="Gift to @username..." style="margin-bottom:6px;">
+          <button class="btn btn-outline btn-sm w-full" style="justify-content:center;" onclick="sendGift()">🎁 Send as Gift</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="market-main">
+      <div class="tabs-row">
+        <button class="tab-btn active" onclick="filterProducts(this,'all')">All</button>
+        <button class="tab-btn" onclick="filterProducts(this,'drinks')">🍺 Drinks</button>
+        <button class="tab-btn" onclick="filterProducts(this,'shots')">🥃 Spirits</button>
+        <button class="tab-btn" onclick="filterProducts(this,'cocktails')">🍹 Cocktails</button>
+        <button class="tab-btn" onclick="filterProducts(this,'food')">🍟 Food</button>
+        <button class="tab-btn" onclick="filterProducts(this,'merch')">👕 Merch</button>
+        <button class="tab-btn" onclick="filterProducts(this,'collectibles')">✨ Collectibles</button>
+      </div>
+      <div class="market-grid" id="products-grid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+const products = [
+  { id:1, name:'Guinness Draft', emoji:'🍺', desc:'The classic. Cold, dark & smooth.', price:120, cat:'drinks', badge:'Best Seller' },
+  { id:2, name:'Heineken Bottle', emoji:'🍶', desc:'Crisp & refreshing lager.', price:100, cat:'drinks' },
+  { id:3, name:'Craft IPA', emoji:'🍻', desc:'Hoppy, bold, and local.', price:130, cat:'drinks' },
+  { id:4, name:'Non-Alcoholic Lager', emoji:'🥤', desc:'All the vibe, zero alcohol.', price:80, cat:'drinks', badge:'New' },
+  { id:5, name:'Neon Spritz', emoji:'🍹', desc:'Pink, fizzy, legendary.', price:200, cat:'cocktails', badge:'Fan Fave' },
+  { id:6, name:'Mojito', emoji:'🌿', desc:'Mint, lime, perfection.', price:180, cat:'cocktails' },
+  { id:7, name:'Espresso Martini', emoji:'☕', desc:'Coffee meets cocktail.', price:220, cat:'cocktails' },
+  { id:8, name:'Passion Fruit Daiquiri', emoji:'🌺', desc:'Tropical & sweet.', price:210, cat:'cocktails' },
+  { id:9, name:'Smoky Scotch', emoji:'🥃', desc:'Highland single malt.', price:350, cat:'shots', badge:'Premium' },
+  { id:10, name:'Tequila Shot', emoji:'🍋', desc:'Salt. Shot. Lime. Repeat.', price:150, cat:'shots' },
+  { id:11, name:'Irish Whiskey', emoji:'🥃', desc:'Smooth & warming.', price:280, cat:'shots' },
+  { id:12, name:'Rum on the Rocks', emoji:'🧊', desc:'Dark & aged. Ice cold.', price:200, cat:'shots' },
+  { id:13, name:'Loaded Nachos', emoji:'🧀', desc:'Cheese, jalapeño, guacamole.', price:150, cat:'food' },
+  { id:14, name:'Chicken Wings', emoji:'🍗', desc:'Sticky BBQ glazed wings.', price:200, cat:'food', badge:'Match Day' },
+  { id:15, name:'Sliders x3', emoji:'🍔', desc:'Mini burgers, big flavour.', price:240, cat:'food' },
+  { id:16, name:'Halloumi Fries', emoji:'🍟', desc:'Crispy, salty, golden.', price:160, cat:'food' },
+  { id:17, name:'DotsBar Tee', emoji:'👕', desc:'Official DotsBar streetwear.', price:800, cat:'merch', badge:'Limited' },
+  { id:18, name:'Bar Cap', emoji:'🧢', desc:'Snap-back. Rep the bar.', price:600, cat:'merch' },
+  { id:19, name:'Foam Finger', emoji:'☝️', desc:'Virtual match day essential.', price:300, cat:'merch' },
+  { id:20, name:'Gold Pint Badge', emoji:'🏅', desc:'Exclusive DotsBar collector badge.', price:500, cat:'collectibles', badge:'Rare' },
+  { id:21, name:'Match Day Trophy NFT', emoji:'🏆', desc:'Limited edition match day drop.', price:1000, cat:'collectibles', badge:'Ultra Rare' },
+  { id:22, name:'Founders Pass', emoji:'💎', desc:'OG member exclusive — forever perks.', price:2000, cat:'collectibles', badge:'OG' },
+];
+
+let cart = JSON.parse(localStorage.getItem('cart')||'[]');
+let coins = 1000;
+let currentCat = 'all';
+
+function buildGrid(cat='all') {
+  currentCat = cat;
+  const filtered = cat==='all' ? products : products.filter(p=>p.cat===cat);
+  document.getElementById('products-grid').innerHTML = filtered.map(p => `
+    <div class="product-card">
+      <div class="product-img">
+        ${p.emoji}
+        ${p.badge ? `<span class="product-badge category-tag events" style="font-size:0.65rem;">${p.badge}</span>` : ''}
+      </div>
+      <div class="product-body">
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-footer">
+          <div class="product-price">${p.price} 🪙</div>
+          <button class="btn btn-primary btn-sm" onclick="addToCart({id:${p.id},name:'${p.name}',emoji:'${p.emoji}',price:${p.price},cat:'${p.cat}'})">+ Add</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterProducts(el, cat) {
+  document.querySelectorAll('.sidebar-link').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  buildGrid(cat);
+}
+
+function addToCart(item) {
+  cart.push(item);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartUI();
+  showToast(`${item.emoji} ${item.name} added!`, 'info');
+}
+
+function removeFromCart(idx) {
+  cart.splice(idx,1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartUI();
+}
+
+function updateCartUI() {
+  const total = cart.reduce((s,i)=>s+i.price,0);
+  const badge = document.getElementById('cart-badge');
+  if (badge) {
+    badge.textContent = cart.length;
+    badge.classList.toggle('hidden', cart.length===0);
+  }
+  document.getElementById('cart-total').textContent = `${total} 🪙`;
+  const list = document.getElementById('cart-list');
+  if (!list) return;
+  if (cart.length===0) { list.innerHTML='<div class="cart-empty">Your order is empty.<br>Add something from the bar!</div>'; return; }
+  list.innerHTML = cart.map((i,idx)=>`
+    <div class="cart-item">
+      <span>${i.emoji} ${i.name}</span>
+      <span style="display:flex;align-items:center;gap:8px;">
+        <span style="color:var(--amber);font-weight:700;">${i.price}🪙</span>
+        <button onclick="removeFromCart(${idx})" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;">×</button>
+      </span>
+    </div>`).join('');
+}
+
+function checkout() {
+  if (cart.length===0) { showToast('Add something first!','error'); return; }
+  const total = cart.reduce((s,i)=>s+i.price,0);
+  cart=[];
+  localStorage.setItem('cart','[]');
+  updateCartUI();
+  showToast(`🍺 Order placed! ${total} DotsCoins spent. Enjoy!`, 'success');
+}
+
+function sendGift() {
+  const to = document.getElementById('gift-to').value.trim();
+  if (!to) { showToast('Enter a username to gift to','error'); return; }
+  if (cart.length===0) { showToast('Add items first!','error'); return; }
+  cart=[]; localStorage.setItem('cart','[]');
+  updateCartUI();
+  document.getElementById('gift-to').value='';
+  showToast(`🎁 Gift sent to ${to}! They\'ll love it.`, 'success');
+}
+
+function showToast(msg, type='info') {
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div'); t.className=`toast ${type}`;
+  t.innerHTML=`<span>${type==='success'?'✅':type==='error'?'❌':'🛒'}</span><span>${msg}</span>`;
+  tc.appendChild(t); setTimeout(()=>t.remove(),4000);
+}
+
+buildGrid();
+updateCartUI();
+
+(function(){
+  const u=JSON.parse(localStorage.getItem('user')||'null');
+  const b=document.getElementById('nav-user-btn');
+  if(u&&b) b.textContent=`👤 ${u.username}`;
+})();
+</script>
+</body>
+</html>

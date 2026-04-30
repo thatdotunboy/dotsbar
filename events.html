@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DotsBar — Events</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { padding-top: 68px; }
+    .events-page-wrap { max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px; }
+    .events-hero {
+      background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(124,58,237,0.06));
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: 60px;
+      margin-bottom: 60px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 40px;
+      align-items: center;
+    }
+    .events-hero h1 { font-size: 2.2rem; font-weight: 900; margin-bottom: 12px; }
+    .events-hero p { color: var(--text-secondary); margin-bottom: 24px; }
+    .events-layout { display: grid; grid-template-columns: 1fr 320px; gap: 32px; }
+    .event-card {
+      background: var(--bg-card); border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg); padding: 24px; margin-bottom: 14px;
+      transition: var(--transition); cursor: pointer;
+      display: grid; grid-template-columns: auto 1fr auto; gap: 20px; align-items: center;
+    }
+    .event-card:hover { border-color: rgba(245,158,11,0.3); transform: translateX(6px); }
+    .event-card.live-event { border-left: 3px solid var(--crimson); }
+    .event-day { font-family:'Outfit',sans-serif; font-size: 2rem; font-weight: 900; color: var(--amber); line-height: 1; }
+    .event-month { font-size: 0.7rem; color: var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
+    .event-content h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .event-content .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+    .event-content .meta-row { display: flex; gap: 14px; font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; }
+    .event-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+    .event-price { font-family:'Outfit',sans-serif; font-weight: 700; color: var(--amber); font-size: 0.9rem; }
+    .host-cta { background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.04)); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px; }
+    .host-cta h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .host-cta p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; }
+    .create-event-form { display: none; padding-top: 16px; border-top: 1px solid var(--glass-border); margin-top: 16px; }
+    .create-event-form.visible { display: block; }
+    .categories-panel { background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; }
+    .cat-chip { padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; background: var(--bg-card2); border: 1px solid var(--glass-border); color: var(--text-secondary); transition: var(--transition); display: inline-block; margin: 4px; }
+    .cat-chip.active, .cat-chip:hover { background: rgba(245,158,11,0.15); border-color: var(--amber); color: var(--amber); }
+    .events-section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .events-section-head h2 { font-size: 1.2rem; font-weight: 700; }
+    @media (max-width:1024px) { .events-layout { grid-template-columns: 1fr; } .events-hero { grid-template-columns: 1fr; padding: 40px 24px; } }
+    @media (max-width:768px) { .event-card { grid-template-columns: auto 1fr; } .event-actions { display: none; } }
+  </style>
+</head>
+<body>
+<header id="main-header">
+  <div class="container">
+    <a href="index.html" class="logo"><img src="logo.svg" alt="DotsBar"><span class="logo-text">Dots<span>Bar</span></span></a>
+    <nav><ul>
+      <li><a href="bar.html">🍺 The Bar</a></li>
+      <li><a href="stream.html" class="live-indicator">Stream</a></li>
+      <li><a href="events.html" class="active">Events</a></li>
+      <li><a href="marketplace.html">Shop</a></li>
+      <li><a href="index.html">Home</a></li>
+    </ul></nav>
+    <div class="nav-actions">
+      <button class="btn btn-ghost btn-sm" id="nav-user-btn">Log In</button>
+      <button class="btn btn-primary btn-sm" onclick="showCreateForm()">+ Host Event</button>
+    </div>
+  </div>
+</header>
+
+<div class="events-page-wrap">
+  <div class="events-hero">
+    <div>
+      <div class="section-label">📅 DotsBar Events</div>
+      <h1>What's On at DotsBar</h1>
+      <p>Watch parties, DJ nights, live comedy, sports, and exclusive creator events.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="showCreateForm()">+ Host Your Event</button>
+        <a href="stream.html" class="btn btn-outline">🔴 Watch Live</a>
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-family:'Outfit',sans-serif;font-size:3rem;font-weight:900;color:var(--amber);">48</div>
+      <div style="color:var(--text-muted);font-size:0.85rem;">events this week</div>
+    </div>
+  </div>
+
+  <div class="events-layout">
+    <div>
+      <div class="events-section-head">
+        <h2>🔴 Live Now</h2>
+        <span class="live-badge">3 live</span>
+      </div>
+      <div id="live-events-list"></div>
+      <div class="divider" style="margin:28px 0;"></div>
+      <div class="events-section-head">
+        <h2>📅 Upcoming</h2>
+        <span style="font-size:0.85rem;color:var(--text-muted);">This week</span>
+      </div>
+      <div id="upcoming-events-list"></div>
+    </div>
+
+    <div>
+      <div class="host-cta">
+        <h3>🎙 Host Your Own Event</h3>
+        <p>Go live, host a watch party, run a quiz. DotsBar gives you the stage.</p>
+        <button class="btn btn-primary btn-sm w-full" style="justify-content:center;" onclick="showCreateForm()">+ Create Event</button>
+        <div class="create-event-form" id="create-event-form">
+          <label class="form-label">Event Title</label>
+          <input class="form-input" id="evt-title" placeholder="e.g. Champions League Watch Party">
+          <label class="form-label">Category</label>
+          <select class="form-input" id="evt-cat">
+            <option value="sports">⚽ Sports</option>
+            <option value="music">🎵 Music / DJ</option>
+            <option value="talk">🎤 Talk / Comedy</option>
+            <option value="events">🍹 Bar Event</option>
+          </select>
+          <label class="form-label">Date & Time</label>
+          <input class="form-input" id="evt-date" type="datetime-local">
+          <label class="form-label">Type</label>
+          <select class="form-input" id="evt-type"><option value="Free">Free</option><option value="Ticketed">Ticketed</option></select>
+          <button class="btn btn-primary w-full" style="justify-content:center;margin-top:4px;" onclick="createEvent()">📅 Create Event</button>
+        </div>
+      </div>
+      <div class="categories-panel">
+        <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;">Browse by Category</h3>
+        <div>
+          <div class="cat-chip active" onclick="filterCat(this,'all')">All</div>
+          <div class="cat-chip" onclick="filterCat(this,'sports')">⚽ Sports</div>
+          <div class="cat-chip" onclick="filterCat(this,'music')">🎵 Music</div>
+          <div class="cat-chip" onclick="filterCat(this,'talk')">🎤 Talk</div>
+          <div class="cat-chip" onclick="filterCat(this,'events')">🍹 Bar</div>
+        </div>
+      </div>
+      <div class="glass-card" style="padding:20px;">
+        <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:12px;">📊 This Week</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:0.85rem;">
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Total events</span><span style="font-weight:700;">48</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Live now</span><span style="font-weight:700;color:var(--crimson);">3 🔴</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Total attendees</span><span style="font-weight:700;">8,420</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Hosts</span><span style="font-weight:700;">74</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+<script>
+const liveEvents = [
+  { title:'Arsenal vs Chelsea Watch Party 🔴', host:'RedGunners', cat:'sports', viewers:1204, started:'72 min ago' },
+  { title:'Saturday Night DJ Mix — DJ Kicks', host:'DJ Kicks', cat:'music', viewers:847, started:'2h ago' },
+  { title:'Pub Quiz Championship — Live!', host:'QuizMasterK', cat:'talk', viewers:312, started:'14 min ago' },
+];
+const upcoming = [
+  { day:'22', month:'APR', title:'DJ Kicks Saturday Night Set', host:'DJ Kicks', time:'9:00 PM GMT', cat:'music', type:'Ticketed', price:'500🪙' },
+  { day:'24', month:'APR', title:'Pub Quiz Finals', host:'QuizMasterK', time:'7:00 PM GMT', cat:'talk', type:'Free', price:'Free' },
+  { day:'25', month:'APR', title:'Cocktail Making Masterclass', host:'BarMaven', time:'6:00 PM GMT', cat:'events', type:'Ticketed', price:'200🪙' },
+  { day:'26', month:'APR', title:'Champions League Semi-Final Party', host:'DotsBar HQ', time:'7:45 PM GMT', cat:'sports', type:'Free', price:'Free' },
+  { day:'28', month:'APR', title:'Open Mic Night — Comedy', host:'VibeComedyUK', time:'8:00 PM GMT', cat:'talk', type:'Free', price:'Free' },
+  { day:'30', month:'APR', title:'DotsBar Monthly Creator Night', host:'DotsBar HQ', time:'9:00 PM GMT', cat:'events', type:'Ticketed', price:'750🪙' },
+];
+let currentFilter = 'all';
+
+function buildLive() {
+  document.getElementById('live-events-list').innerHTML = liveEvents.map(e => `
+    <div class="event-card live-event" onclick="window.location.href='stream.html'">
+      <div style="text-align:center;min-width:54px;"><div style="font-size:1.6rem;">🔴</div><div class="event-month">LIVE</div></div>
+      <div class="event-content">
+        <h3>${e.title}</h3>
+        <div class="badges"><span class="live-badge">Live</span><span class="category-tag ${e.cat}">${e.cat}</span></div>
+        <div class="meta-row"><span>🎙 ${e.host}</span><span>👁 ${e.viewers.toLocaleString()} watching</span><span>⏱ Started ${e.started}</span></div>
+      </div>
+      <div class="event-actions"><button class="btn btn-danger btn-sm">Watch</button></div>
+    </div>`).join('');
+}
+
+function buildUpcoming(filter='all') {
+  const list = filter==='all' ? upcoming : upcoming.filter(e=>e.cat===filter);
+  document.getElementById('upcoming-events-list').innerHTML = list.map(e => `
+    <div class="event-card" onclick="rsvp('${e.title}')">
+      <div style="text-align:center;min-width:54px;"><div class="event-day">${e.day}</div><div class="event-month">${e.month}</div></div>
+      <div class="event-content">
+        <h3>${e.title}</h3>
+        <div class="badges"><span class="category-tag ${e.cat}">${e.cat}</span><span class="category-tag ${e.type==='Free'?'talk':'events'}">${e.type}</span></div>
+        <div class="meta-row"><span>🎙 ${e.host}</span><span>🕐 ${e.time}</span></div>
+      </div>
+      <div class="event-actions"><div class="event-price">${e.price}</div><button class="btn btn-outline btn-sm">RSVP</button></div>
+    </div>`).join('');
+}
+
+buildLive(); buildUpcoming();
+
+function filterCat(el, cat) {
+  document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); currentFilter = cat; buildUpcoming(cat);
+}
+function rsvp(t) { showToast(`✅ You're going to "${t}"!`, 'success'); }
+function showCreateForm() { document.getElementById('create-event-form').classList.toggle('visible'); }
+function createEvent() {
+  const title = document.getElementById('evt-title').value.trim();
+  if (!title) { showToast('Please enter a title','error'); return; }
+  const d = new Date(document.getElementById('evt-date').value || Date.now());
+  const months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const user = JSON.parse(localStorage.getItem('user')||'null');
+  upcoming.unshift({ day:String(d.getDate()).padStart(2,'0'), month:months[d.getMonth()], title, host:user?.username||'You', time:d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+' local', cat:document.getElementById('evt-cat').value, type:document.getElementById('evt-type').value, price:'TBD' });
+  buildUpcoming(currentFilter);
+  document.getElementById('create-event-form').classList.remove('visible');
+  document.getElementById('evt-title').value='';
+  showToast(`🎉 "${title}" created!`, 'success');
+}
+function showToast(msg, type='info') {
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div'); t.className=`toast ${type}`;
+  t.innerHTML=`<span>${type==='success'?'✅':type==='error'?'❌':'📅'}</span><span>${msg}</span>`;
+  tc.appendChild(t); setTimeout(()=>t.remove(),4000);
+}
+(function(){ const u=JSON.parse(localStorage.getItem('user')||'null'); const b=document.getElementById('nav-user-btn'); if(u&&b) b.textContent=`👤 ${u.username}`; })();
+</script>
+</body>
+</html>

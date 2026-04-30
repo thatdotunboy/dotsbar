@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms - DotBar</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="index.html" class="logo"><img src="logo.svg" alt="DotsBar Logo" style="height: 50px;"></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="rooms.html">Rooms</a></li>
+                    <li><a href="#profile">Profile</a></li>
+                </ul>
+            </nav>
+            <div id="user-info"></div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="rooms-list">
+            <h2>Available Rooms</h2>
+            <div id="rooms-container"></div>
+        </section>
+
+        <section id="create-room" style="display: none;">
+            <h2>Create New Room</h2>
+            <form id="create-room-form">
+                <input type="text" id="room-name" placeholder="Room Name" required>
+                <textarea id="room-description" placeholder="Description"></textarea>
+                <button type="submit">Create Room</button>
+            </form>
+        </section>
+
+        <section id="room-view" style="display: none;">
+            <h2 id="current-room-name"></h2>
+            <div id="stream-container">
+                <video id="local-video" autoplay muted></video>
+                <div id="remote-videos"></div>
+            </div>
+            <div id="controls">
+                <button id="join-room">Join Room</button>
+                <button id="mute-toggle" disabled>Mute</button>
+                <button id="leave-room" disabled>Leave</button>
+            </div>
+            <div id="chat">
+                <div id="messages"></div>
+                <input type="text" id="message-input" placeholder="Type a message...">
+                <button id="send-message">Send</button>
+            </div>
+            <button id="tip-button">Tip Creator</button>
+        </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="rooms.js"></script>
+</body>
+</html>
